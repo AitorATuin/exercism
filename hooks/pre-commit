@@ -1,0 +1,41 @@
+#!/bin/env lua
+--vim:set et ft=lua sw=2 ts=2:
+
+local FILES_REGEX = "A%s+([^/]+)/([^/]+)/([^/]+)"
+
+local LANG_EXT = {
+  lua = "lua",
+  go = "go"
+}
+
+local function files_to_encrypt()
+  local files = {}
+  local cmd = "git status -s --untracked-files=no"
+  local pipe = io.popen(cmd)
+  for line in pipe:lines() do
+    local lang, exercise, file = line:match(FILES_REGEX)
+    local file_name = nil
+    if lang and exercise and file and LANG_EXT[lang] then
+      file_name = file:match("([^.]+)%." .. LANG_EXT[lang])
+      if file_name and file_name == exercise then
+        files[#files+1] = string.format("%s/%s/%s", lang, exercise, file)
+      end
+    end
+  end
+  return files
+end
+
+local function stage_gitattributes(files)
+  if #files > 0 then
+    for _, file in ipairs(files) do
+      print("Adding file '" .. file .. "' into .gitattributes")
+      print(string.format("%s filter=git-crypt diff=git-crypt", file))
+    end
+    print("staging updated .gitattributes")
+    os.execute("echo git add .gitattributes")
+  else
+    print("No files to add into .gitattributes")
+  end
+end
+
+stage_gitattributes(files_to_encrypt())
