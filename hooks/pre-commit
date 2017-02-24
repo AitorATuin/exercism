@@ -3,6 +3,8 @@
 
 local FILES_REGEX = "A%s+([^/]+)/([^/]+)/([^/]+)"
 
+local GIT_ATTRS_FILE = ".gitattributes"
+
 local LANG_EXT = {
   lua = "lua",
   go = "go"
@@ -27,12 +29,14 @@ end
 
 local function stage_gitattributes(files)
   if #files > 0 then
+    local fd = io.open(GIT_ATTRS_FILE, "a")
     for _, file in ipairs(files) do
       print("Adding file '" .. file .. "' into .gitattributes")
-      print(string.format("%s filter=git-crypt diff=git-crypt", file))
+      fd:write(string.format("%s filter=git-crypt diff=git-crypt", file))
     end
+    fd:close()
     print("staging updated .gitattributes")
-    os.execute("echo git add .gitattributes")
+    os.execute("git add .gitattributes")
   else
     print("No files to add into .gitattributes")
   end
