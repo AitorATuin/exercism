@@ -10,36 +10,47 @@ local LANG_EXT = {
   go = "go"
 }
 
-local function files_to_encrypt()
-  local files = {}
+local function needed_gitattributes_entries()
+  local entries = {}
   local cmd = "git status -s --untracked-files=no"
   local pipe = io.popen(cmd)
+  local n = 0
   for line in pipe:lines() do
     local lang, exercise, file = line:match(FILES_REGEX)
     local file_name = nil
     if lang and exercise and file and LANG_EXT[lang] then
       file_name = file:match("([^.]+)%." .. LANG_EXT[lang])
       if file_name and file_name == exercise then
-        files[#files+1] = string.format("%s/%s/%s", lang, exercise, file)
+        local str = string.format("%s/%s/%s", lang, exercise, file)
+        n = n + 1
+        entries[str] = true
       end
     end
   end
-  return files
+  return entries, n
 end
 
-local function stage_gitattributes(files)
-  if #files > 0 then
-    local fd = io.open(GIT_ATTRS_FILE, "a")
-    for _, file in ipairs(files) do
-      print("Adding file '" .. file .. "' into .gitattributes")
-      fd:write(string.format("%s filter=git-crypt diff=git-crypt", file))
+local function stage_gitattributes(entries, n)
+  if n > 0 then
+    local fd = io.open(GIT_ATTRS_FILE, "r")
+    for line in fd:lines() do
+      -- Remove the entry if it's already in the .gitattributes files
+      if entries[line] == true then
+        entries[line] = nil
+        n = n - 1
+      end
     end
     fd:close()
-    print("staging updated .gitattributes")
-    os.execute("git add .gitattributes")
-  else
-    print("No files to add into .gitattributes")
   end
+  return entries, n
 end
 
-stage_gitattributes(files_to_encrypt())
+local entries, n = stage_gitattributes(needed_gitattributes_entries())
+if n > 0 then
+  print("The following files will be commited unencrypted:")
+  for entry in pairs(entries) do
+    print(string.format("   %s", entry))  
+  end
+  print("Aborting commit!")
+  os.exit(1)
+end
