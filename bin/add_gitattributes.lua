@@ -92,7 +92,7 @@ local function main(...)
     end
   end
   fd:close()
-  print(commit_msg)
+
   if #commit_msg > 0 then
     print("Stagging " .. GIT_ATTR_FILE .. " ...")
     os.execute("git add " .. GIT_ATTR_FILE)
