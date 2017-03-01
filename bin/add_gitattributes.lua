@@ -29,13 +29,17 @@ local function get_files_added()
   return files_added
 end
 
+local function norm_str(filename)
+  return filename:gsub("-", "_")
+end
+
 local function get_files_in_exercise(lang, exercise)
   return function()
     local pipe = io.popen(string.format("ls %s/%s", lang, exercise))
     local files_to_add = {}
     for line in pipe:lines() do
       for filename, ext in line:gmatch("([^%.]+).(%w+)") do
-        if exercise == filename then
+        if norm_str(exercise) == norm_str(filename) then
           local file = {
             lang = lang,
             exercise = exercise,
