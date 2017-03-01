@@ -71,11 +71,27 @@ local co_iter = function(co)
   end
 end
 
+local function stage_gitattributes(run_dry, commit_msg)
+  local f = os.execute
+  if run_dry then
+    f = print
+  end
+  f("git add " .. GIT_ATTR_FILE)
+  f("git commit -m \"Add gitattributes for:" .. commit_msg .. "\"")
+end
+
+local function add_to_gitattributes(fd, entry, run_dry)
+  if not run_dry then
+    fd:write(entry)
+  end
+end
+
 local function main(...)
   local langs = arg
   if #langs == 0 then
     os.exit(1)
   end
+  local RUN_DRY = os.getenv("RUN_DRY") ~= nil
   local files_added = get_files_added()
   local fd = io.open(GIT_ATTR_FILE, "a")
   local commit_msg = ""
@@ -85,7 +101,7 @@ local function main(...)
         local file_gitattributed = file_to_gitattribute(file)
         if not files_added[file_gitattributed] then
           print(string.format("- Add: %s", file_gitattributed))
-          fd:write(file_gitattributed .. "\n")
+          add_to_gitattributes(fd, file_gitattributed .. "\n", RUN_DRY)
           commit_msg = string.format("%s\n  - %s", commit_msg, file_gitattributed)
         end
       end
@@ -95,8 +111,7 @@ local function main(...)
 
   if #commit_msg > 0 then
     print("Stagging " .. GIT_ATTR_FILE .. " ...")
-    os.execute("git add " .. GIT_ATTR_FILE)
-    os.execute("git commit -m \"Add gitattributes for:" .. commit_msg .. "\"")
+    stage_gitattributes(RUN_DRY, commit_msg)
   end
 end
 
