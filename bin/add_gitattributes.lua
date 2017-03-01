@@ -1,7 +1,8 @@
 #!/bin/lua
--- nnoremap <silent> <f6> :call REPLSend(['lua $HOME/exercism/bin/exercism_git.lua lua go'])<CR>
 
 local GIT_ATTR_FILE = ".gitattributes"
+--
+--  lang/exercise/exercise.lua filter=git-crypt diff=git-crypt
 local GIT_ATTR_REGEX = "([^/]+)/([^/]+)/([^/]+)%.(%w+) filter%=git%-crypt diff%=git%-crypt"
 
 local function file_to_gitattribute(file)
@@ -13,17 +14,16 @@ local function get_files_added()
   local files_added = {}
   local fd = io.open(GIT_ATTR_FILE, "r")
   -- We search for pattern:
-  --  lang/exercise/exercise.lua filter=git-crypt diff=git-crypt
   for line in fd:lines() do
-		line:gsub(GIT_ATTR_REGEX, function(lang, exercise, filename, ext)
-			file = {
+    line:gsub(GIT_ATTR_REGEX, function(lang, exercise, filename, ext)
+      file = {
         lang = lang,
         exercise = exercise,
         filename = filename,
         ext = ext
       }
       files_added[file_to_gitattribute(file)] = true
-		end)
+    end)
   end
   fd:close()
   return files_added
@@ -36,7 +36,7 @@ local function get_files_in_exercise(lang, exercise)
     for line in pipe:lines() do
       for filename, ext in line:gmatch("([^%.]+).(%w+)") do
         if exercise == filename then
-          file = {
+          local file = {
             lang = lang,
             exercise = exercise,
             filename = filename,
@@ -77,15 +77,26 @@ local function main(...)
     os.exit(1)
   end
   local files_added = get_files_added()
+  local fd = io.open(GIT_ATTR_FILE, "a")
+  local commit_msg = ""
   for _, lang in ipairs(langs) do
     for exercise in co_iter(get_exercises(lang)) do
       for file in co_iter(get_files_in_exercise(lang, exercise)) do
         local file_gitattributed = file_to_gitattribute(file)
         if not files_added[file_gitattributed] then
           print(string.format("- Add: %s", file_gitattributed))
+          fd:write(file_gitattributed .. "\n")
+          commit_msg = string.format("%s\n  - %s", commit_msg, file_gitattributed)
         end
       end
     end
+  end
+  fd:close()
+  print(commit_msg)
+  if #commit_msg > 0 then
+    print("Stagging " .. GIT_ATTR_FILE .. " ...")
+    os.execute("git add " .. GIT_ATTR_FILE)
+    os.execute("git commit -m \"Add gitattributes for:" .. commit_msg .. "\"")
   end
 end
 
