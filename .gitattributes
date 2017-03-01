@@ -1,1 +1,4 @@
 lua/hello-world/hello-world.lua filter=git-crypt diff=git-crypt
+lua/accumulate/accumulate.lua filter=git-crypt diff=git-crypt
+lua/hamming/hamming.lua filter=git-crypt diff=git-crypt
+lua/house/house.lua filter=git-crypt diff=git-crypt
