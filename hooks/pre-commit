@@ -5,6 +5,8 @@ local FILES_REGEX = "A%s+([^/]+)/([^/]+)/([^/]+)"
 
 local GIT_ATTRS_FILE = ".gitattributes"
 
+local GIT_ATTR_REGEX = "([^/]+)/([^/]+)/([^/]+)%.(%w+) filter%=git%-crypt diff%=git%-crypt"
+
 local LANG_EXT = {
   lua = "lua",
   go = "go"
@@ -35,7 +37,8 @@ local function stage_gitattributes(entries, n)
     local fd = io.open(GIT_ATTRS_FILE, "r")
     for line in fd:lines() do
       -- Remove the entry if it's already in the .gitattributes files
-      if entries[line] == true then
+      local lang, exercise, file, ext = line:match(GIT_ATTR_REGEX)
+      if entries[string.format("%s/%s/%s.%s", lang, exercise, file, ext)] then
         entries[line] = nil
         n = n - 1
       end
