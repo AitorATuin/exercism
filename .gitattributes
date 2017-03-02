@@ -6,3 +6,4 @@ go/clock/clock.go filter=git-crypt diff=git-crypt
 go/hello-world/hello_world.go filter=git-crypt diff=git-crypt
 go/leap/leap.go filter=git-crypt diff=git-crypt
 go/pangram/pangram.go filter=git-crypt diff=git-crypt
+go/hamming/hamming.go filter=git-crypt diff=git-crypt
