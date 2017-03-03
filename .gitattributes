@@ -8,3 +8,4 @@ go/leap/leap.go filter=git-crypt diff=git-crypt
 go/pangram/pangram.go filter=git-crypt diff=git-crypt
 go/hamming/hamming.go filter=git-crypt diff=git-crypt
 go/raindrops/raindrops.go filter=git-crypt diff=git-crypt
+go/acronym/acronym.go filter=git-crypt diff=git-crypt
