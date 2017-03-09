@@ -11,3 +11,5 @@ go/raindrops/raindrops.go filter=git-crypt diff=git-crypt
 go/acronym/acronym.go filter=git-crypt diff=git-crypt
 go/bob/bob.go filter=git-crypt diff=git-crypt
 go/triangle/triangle.go filter=git-crypt diff=git-crypt
+go/gigasecond/gigasecond.go filter=git-crypt diff=git-crypt
+go/secret-handshake/secret_handshake.go filter=git-crypt diff=git-crypt
