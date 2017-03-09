@@ -13,3 +13,4 @@ go/bob/bob.go filter=git-crypt diff=git-crypt
 go/triangle/triangle.go filter=git-crypt diff=git-crypt
 go/gigasecond/gigasecond.go filter=git-crypt diff=git-crypt
 go/secret-handshake/secret_handshake.go filter=git-crypt diff=git-crypt
+go/pascals-triangle/pascals_triangle.go filter=git-crypt diff=git-crypt
