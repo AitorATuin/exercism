@@ -29,9 +29,7 @@ defmodule NucleotideCount do
   def histogram(strand) do
     ## TODO: Resolve using curried functions
     Enum.map(@nucleotides, &{&1, NucleotideCount.count(strand, &1)})
-    |> (fn d ->
-          Enum.sort(d, fn {_, a}, {_, b} -> a > b end)
-        end).()
+    |> Enum.sort(fn {_, a}, {_, b} -> a > b end)
     |> Map.new()
   end
 end
