@@ -1,11 +1,7 @@
 defmodule Strain do
 
-  # TODO: Implement a macro to use fun as a guard
-  defp filter([], _fun), do: [] 
-  defp filter([x|xs], fun) do
-    if fun.(x) do [x | filter(xs, fun)]
-    else filter(xs, fun)
-    end
+  defp filter(xs, fun) do
+    for x <- xs, fun.(x), do: x 
   end
 
   @doc """
