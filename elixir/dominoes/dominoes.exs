@@ -45,10 +45,13 @@ defmodule Dominoes do
   possible to make a full chain
   """
   @spec chain?(dominoes :: [domino] | []) :: boolean
-  def chain?([]), do: true
-  def chain?([x|xs]) do
-    {_, sol} = update_sol(%{}, x)
-    IO.inspect(norm(xs))
-    _chain?(norm(xs), sol, [])
+  def chain?(dominoes) do
+    case norm(dominoes) do
+      {[], []}          -> true
+      {[], doubles}     -> _chain?([], %{}, doubles)
+      {[x|xs], doubles} -> 
+        {_, sol} = update_sol(%{}, x)
+        _chain?(xs, sol, doubles)
+    end
   end
 end
